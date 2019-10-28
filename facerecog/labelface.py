@@ -2,7 +2,10 @@ import face_recognition
 from PIL import Image, ImageDraw
 import numpy as np
 import os,sys
+import openpyxl
 
+attendance_doc=openpyxl.load_workbook('attendance.xlsx')
+sheet = attendance_doc.get_sheet_by_name('Sheet1')
 # This is an example of running face recognition on a single image
 # and drawing a box around each person that was identified.
 
@@ -47,6 +50,10 @@ for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodi
     if matches[best_match_index]:
         name = known_face_names[best_match_index]
 
+    for i in range(3,7):
+        if sheet.cell(row=i, column=1).value == name:
+            sheet.cell(row=i, column=2).value="Present"
+
     # Draw a box around the face using the Pillow module
     draw.rectangle(((left, top), (right, bottom)), outline=(0, 0, 255))
 
@@ -54,6 +61,7 @@ for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodi
     text_width, text_height = draw.textsize(name)
     draw.rectangle(((left, bottom - text_height - 10), (right, bottom)), fill=(0, 0, 255), outline=(0, 0, 255))
     draw.text((left + 6, bottom - text_height - 5), name, fill=(255, 255, 255, 255))
+attendance_doc.save('attendance.xlsx')
 
 
 # Remove the drawing library from memory as per the Pillow docs
